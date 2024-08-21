@@ -4,67 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Discounted Invoice Calculator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        label, select, input {
-            display: block;
-            margin: 10px 0;
-        }
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-        }
-        input[type="number"] {
-            width: 48%;
-        }
-        button {
-            margin: 20px 0;
-        }
-        table {
-            width: 100%;
-            margin: 20px 0;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        @media (max-width: 600px) {
-            .item-row {
-                flex-direction: column;
-            }
-            input[type="number"] {
-                width: 100%;
-            }
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Discounted Invoice Calculator</h1>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-4 text-gray-800">Discounted Invoice Calculator</h1>
 
-    <label for="discount">Select Discount Value:</label>
-    <select id="discount" name="discount" onchange="updateAllDiscounts()">
-        <option value="15">15%</option>
-        <option value="30">30%</option>
-    </select>
+        <div class="mb-6">
+            <label for="discount" class="block text-lg font-medium text-gray-700 mb-2">Select Discount Value:</label>
+            <select id="discount" name="discount" class="w-full p-2 border rounded-lg" onchange="updateAllDiscounts()">
+                <option value="15">15%</option>
+                <option value="30">30%</option>
+            </select>
+        </div>
 
-    <h2>Invoice Items</h2>
-    <div id="item-list"></div>
-    <button type="button" onclick="addItem()">Add Item</button>
-	<hr/>
-    <h3>Total Price: <span id="total-price">0.00</span></h3>
-    <h3>Total Discount: <span id="total-discount">0.00</span></h3>
-	<hr/>
-    <h3>Sub Total: <span id="sub-total">0.00</span></h3>
-    <h3>PB1 Tax (10%): <span id="pb1-tax">0.00</span></h3>
-    <h3>SC Tax (5%): <span id="sc-tax">0.00</span></h3>
-	<hr/>
-    <h2>Total to be Paid: <span id="final-total">0.00</span></h2>
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Invoice Items</h2>
+        <div id="item-list" class="space-y-4"></div>
+        <button type="button" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500" onclick="addItem()">Add Item</button>
+
+        <div class="mt-6">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-700">Total Price:</h3>
+                <span id="total-price" class="text-lg font-bold text-gray-800">0,00</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-700">Total Discount:</h3>
+                <span id="total-discount" class="text-lg font-bold text-gray-800">0,00</span>
+            </div>
+            <div class="flex justify-between items-center mt-4 border-t pt-4">
+                <h3 class="text-lg font-medium text-gray-700">Sub Total:</h3>
+                <span id="sub-total" class="text-lg font-bold text-gray-800">0,00</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-700">PB1 Tax (10%):</h3>
+                <span id="pb1-tax" class="text-lg font-bold text-gray-800">0,00</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-700">SC Tax (5%):</h3>
+                <span id="sc-tax" class="text-lg font-bold text-gray-800">0,00</span>
+            </div>
+            <div class="flex justify-between items-center mt-4 border-t pt-4">
+                <h2 class="text-xl font-bold text-gray-800">Total to be Paid:</h2>
+                <span id="final-total" class="text-xl font-extrabold text-gray-900">0,00</span>
+            </div>
+        </div>
+    </div>
 
     <script>
         let items = [];
@@ -73,33 +57,46 @@
             const itemList = document.getElementById('item-list');
 
             const itemRow = document.createElement('div');
-            itemRow.classList.add('item-row');
+            itemRow.classList.add('flex', 'space-x-4', 'items-center');
 
             const priceInput = document.createElement('input');
-            priceInput.type = 'number';
+            priceInput.type = 'text';
             priceInput.placeholder = 'Enter item price';
-            priceInput.min = '0';
-            priceInput.step = '0.01';
+            priceInput.classList.add('w-full', 'p-2', 'border', 'rounded-lg');
             priceInput.oninput = () => updateDiscount(priceInput, discountInput);
 
             const discountInput = document.createElement('input');
-            discountInput.type = 'number';
+            discountInput.type = 'text';
             discountInput.placeholder = 'Discount value';
             discountInput.readOnly = true;
+            discountInput.classList.add('w-full', 'p-2', 'border', 'rounded-lg', 'bg-gray-100');
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('px-4', 'py-2', 'bg-red-600', 'text-white', 'rounded-lg', 'hover:bg-red-500');
+            deleteButton.onclick = () => removeItem(itemRow);
 
             itemRow.appendChild(priceInput);
             itemRow.appendChild(discountInput);
+            itemRow.appendChild(deleteButton);
             itemList.appendChild(itemRow);
 
             items.push({ priceInput, discountInput });
         }
 
+        function removeItem(itemRow) {
+            const index = Array.from(itemRow.parentNode.children).indexOf(itemRow);
+            items.splice(index, 1);
+            itemRow.remove();
+            updateTotals();
+        }
+
         function updateDiscount(priceInput, discountInput) {
             const discount = parseFloat(document.getElementById('discount').value);
-            const price = parseFloat(priceInput.value);
+            const price = parseFloat(parseNumber(priceInput.value));
             if (!isNaN(price)) {
                 const discountAmount = price * (discount / 100);
-                discountInput.value = discountAmount.toFixed(2);
+                discountInput.value = formatNumber(discountAmount);
                 updateTotals();
             }
         }
@@ -114,25 +111,36 @@
             let totalPrice = 0;
             let totalDiscount = 0;
             items.forEach(({ priceInput, discountInput }) => {
-                const price = parseFloat(priceInput.value);
-                const discountAmount = parseFloat(discountInput.value);
+                const price = parseFloat(parseNumber(priceInput.value));
+                const discountAmount = parseFloat(parseNumber(discountInput.value));
                 if (!isNaN(price) && !isNaN(discountAmount)) {
                     totalPrice += price;
                     totalDiscount += discountAmount;
                 }
             });
 
-			const subTotal = totalPrice - totalDiscount
+			const subTotal = totalPrice - totalDiscount;
             const pb1Tax = subTotal * 0.1;
             const scTax = subTotal * 0.05;
-            const finalTotal = totalPrice - totalDiscount + pb1Tax + scTax;
-			
-            document.getElementById('total-price').textContent = totalPrice.toFixed(2);
-            document.getElementById('total-discount').textContent = totalDiscount.toFixed(2);
-            document.getElementById('sub-total').textContent = subTotal.toFixed(2);
-            document.getElementById('pb1-tax').textContent = pb1Tax.toFixed(2);
-            document.getElementById('sc-tax').textContent = scTax.toFixed(2);
-            document.getElementById('final-total').textContent = finalTotal.toFixed(2);
+            const finalTotal = subTotal + pb1Tax + scTax;
+
+            document.getElementById('total-price').textContent = formatNumber(totalPrice);
+            document.getElementById('total-discount').textContent = formatNumber(totalDiscount);
+            document.getElementById('sub-total').textContent = formatNumber(subTotal);
+            document.getElementById('pb1-tax').textContent = formatNumber(pb1Tax);
+            document.getElementById('sc-tax').textContent = formatNumber(scTax);
+            document.getElementById('final-total').textContent = formatNumber(finalTotal);
+        }
+
+        function formatNumber(value) {
+            return value.toLocaleString('de-DE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+        }
+
+        function parseNumber(value) {
+            return value.replace(/\./g, '').replace(',', '.');
         }
     </script>
 </body>
